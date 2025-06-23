@@ -1,0 +1,7 @@
+{
+  "name": "phase2",
+  "private": true,
+  "dependencies": {
+    "snarkjs": "0.7.5"
+  }
+}
