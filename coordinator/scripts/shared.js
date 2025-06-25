@@ -1,5 +1,6 @@
-const snarkjs = require("snarkjs");
 const fs = require("node:fs");
+const os = require("node:os");
+const { fork } = require("node:child_process");
 
 const WORKSPACE_FOLDER = "/workspace";
 const R1CS = `${WORKSPACE_FOLDER}/r1cs`;
@@ -8,6 +9,31 @@ const CONTRIBUTIONS_PATH = `${WORKSPACE_FOLDER}/contributions`;
 const CONTRIBUTIONS_LOG = `${WORKSPACE_FOLDER}/log.json`;
 const FINAL_PATH = `${WORKSPACE_FOLDER}/final`;
 
+Promise.queue = function (
+  promises = [],
+  concurrency = os.availableParallelism()
+) {
+  return new Promise((res) => {
+    const tasks = [...promises];
+    const results = [];
+
+    let resolved = false;
+
+    const runNext = () => {
+      if (tasks.length > 0) {
+        const task = tasks.shift()();
+        results.push(task);
+        task.finally(runNext);
+      } else if (!resolved) {
+        resolved = true;
+        res(Promise.all(results));
+      }
+    };
+
+    for (let i = 1; i < concurrency; i += 1) runNext();
+  });
+};
+
 function contributionPath(contributionNumber) {
   return `${CONTRIBUTIONS_PATH}/${contributionNumber
     .toString()
@@ -15,16 +41,20 @@ function contributionPath(contributionNumber) {
 }
 
 async function verifyCircuit(circuit, contributionNumber) {
-  const mpcParams = await snarkjs.zKey.verifyFromR1cs(
-    `${R1CS}/${circuit}.r1cs`,
-    `${PHASE1_PTAU}`,
-    `${contributionPath(contributionNumber)}/${circuit}.zkey`
-  );
+  return new Promise((res) => {
+    console.log(`Verifying ${circuit}`);
 
-  return {
-    valid: mpcParams !== false,
-    mpcParams,
-  };
+    const forked = fork("/scripts/verifySingleCircuit.js");
+
+    forked.on("message", (mpcParams) => {
+      res(mpcParams);
+    });
+
+    forked.send({
+      circuit,
+      contributionNumber,
+    });
+  });
 }
 
 function arrayToHex(array, byteLength) {

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require("node:fs");
+const process = require("node:process");
 const {
   constants,
   verifyCircuit,
@@ -25,23 +26,27 @@ async function verifyAndLog(circuits) {
   let allValid = true;
   const contributionLog = [];
 
-  for (const circuit of circuits) {
-    const verification = await verifyCircuit(circuit, 0);
+  const queue = circuits.map((circuit) => async () => {
+    return {
+      name: circuit,
+      verification: await verifyCircuit(circuit, 0),
+    };
+  });
 
-    if (verification.valid == false) {
+  const results = await Promise.queue(queue);
+
+  for (const circuit of results) {
+    if (circuit.verification.valid == false) {
       allValid = false;
-      console.log(`${circuit} failed validation check!`);
+      console.log(`${circuit.name} failed validation check!`);
     } else {
-      console.log(`${circuit} is valid`);
+      console.log(`${circuit.name} is valid`);
 
-      verification.mpcParams.contributions.map((contribution, i) => {
+      circuit.verification.mpcParams.contributions.map((contribution, i) => {
         if (!contributionLog[i])
           contributionLog[i] = { name: null, number: null, contributions: {} };
 
-        contributionLog[i].contributions[circuit] = arrayToHex(
-          contribution.contributionHash,
-          32
-        );
+        contributionLog[i].contributions[circuit.name] = contribution;
       });
     }
   }

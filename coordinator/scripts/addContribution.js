@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 const fs = require("node:fs");
+const process = require("node:process");
 const {
   contributionLogFile,
   getCurrentContributionNumber,
   verifyCircuit,
-  arrayToHex,
   readTranscript,
   contributionPath,
 } = require("./shared");
@@ -16,9 +16,7 @@ async function verifyCircuitContributions(
 ) {
   const verification = await verifyCircuit(circuit, nextContributionNumber);
 
-  const newFileContributions = verification.mpcParams.contributions.map(
-    (contribution) => arrayToHex(contribution.contributionHash, 32)
-  );
+  const newFileContributions = verification.mpcParams.contributions;
 
   let valid = true;
 
@@ -36,7 +34,7 @@ async function verifyCircuitContributions(
       contributionLog[contributionIndex].contributions[circuit] !==
       newFileContributions[nextNewFileContributionsIndex]
     ) {
-      console.log(`${circuit} HAS INVALID CONTRIBUTION}`);
+      console.log(`${circuit} HAS INVALID CONTRIBUTION`);
       valid = false;
     }
 
@@ -83,18 +81,21 @@ async function main() {
 
   let allValid = true;
 
-  for (const circuit of circuits) {
-    const valid = await verifyCircuitContributions(
-      circuit,
-      contributionLog,
-      nextContributionNumber
-    );
+  const queue = circuits.map((circuit) => async () => {
+    return {
+      name: circuit,
+      verification: await verifyCircuitContributions(circuit, contributionLog, nextContributionNumber),
+    };
+  });
 
-    allValid = allValid && valid;
+  const results = await Promise.queue(queue);
+
+  for (const circuit of results) {
+    allValid = allValid && circuit.verification;
     console.log(
-      valid
-        ? `${circuit} contributions valid`
-        : `${circuit} contributions invalid`
+      circuit.verification
+        ? `${circuit.name} contributions valid`
+        : `${circuit.name} contributions invalid`
     );
   }
 
