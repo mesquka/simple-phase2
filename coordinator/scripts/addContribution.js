@@ -83,7 +83,7 @@ async function main() {
 
   let allValid = true;
 
-  for (const circuit in circuits) {
+  for (const circuit of circuits) {
     const valid = await verifyCircuitContributions(
       circuit,
       contributionLog,

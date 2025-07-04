@@ -55,7 +55,7 @@ async function main() {
     contributions: {},
   };
 
-  for (const circuit in circuits) {
+  for (const circuit of circuits) {
     console.log(`Contributing to circuit ${circuit}`);
     transcript.contributions[circuit] = await contribute(
       circuit,
