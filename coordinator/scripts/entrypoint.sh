@@ -21,10 +21,6 @@ add)
   NODE_NO_WARNINGS=1 /scripts/addContribution.js
   exit
   ;;
-export)
-  NODE_NO_WARNINGS=1 /scripts/export.js
-  exit
-  ;;
 *)
   echo
   echo "Syntax: <docker run ....> [command]"
@@ -35,7 +31,6 @@ export)
   echo "send      Send files for new ceremony contribution"
   echo "receive   Recieve, verify, and add new ceremony contribution"
   echo "add       Verify and add next contribution from disk (useful if verifying an already performed ceremony)"
-  echo "export    Export ceremony"
   echo
   exit
   ;;

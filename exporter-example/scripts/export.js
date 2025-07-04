@@ -9,7 +9,7 @@ const {
   constants,
   askQuestion,
   promiseQueue,
-} = require("./shared");
+} = require("./shared.js");
 
 const exportFolder = `${constants.WORKSPACE_FOLDER}/export`;
 const tmp = `${exportFolder}/tmp`;
@@ -80,7 +80,7 @@ async function main() {
     fs.mkdirSync(circuitExport);
 
     beaconQueue.push(async () => {
-      await addBeacon(latestContributionNumber, circuit, beacon);
+      return addBeacon(latestContributionNumber, circuit, beacon);
     });
 
     compressionQueue.push(async () => {
@@ -115,14 +115,18 @@ async function main() {
 
   fs.writeFileSync(
     `${exportTranscriptsFolder}/log.json`,
-    `${JSON.stringify({
-      beacon: beaconContributions,
-      ...log,
-    })}\n`
+    `${JSON.stringify(
+      {
+        beacon: beaconContributions,
+        ...log,
+      },
+      undefined,
+      2
+    )}\n`
   );
 
   for (
-    let contributionNumber = 0;
+    let contributionNumber = 1;
     contributionNumber <= latestContributionNumber;
     contributionNumber += 1
   ) {

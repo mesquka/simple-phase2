@@ -78,62 +78,6 @@ Enter response code:
 
 Repeat for each contributor.
 
-Export the results of the ceremony with:
-
-```sh
-docker run \
---rm \ # Clean up container after run
--it \ # Run interactive with tty
--v ${PWD}:/workspace \ # Mount current directory to /workspace in container
-coordinator \ # Container image name, change if you've built it with a different name
-export # Command
-```
-
-Enter the beacon hash you're using for the ceremony (in hex, no leading 0x), this will usually be a block hash of some pre-determined block:
-
-```
-Enter beacon hash:
-```
-
-You will end up with a finalized ceremony workspace that looks like:
-
-```
-workspace
-├── contributions
-│   ├── 0000
-│   │   ├── circuit1.zkey
-│   │   └── circuit2.zkey
-⋮   ⋮
-⋮   ⋮
-│   └── XXXX
-│       ├── circuit1.zkey
-│       ├── circuit2.zkey
-│       └── transcript.json
-├── export
-│   ├── circuits
-│   │   ├── circuit1
-│   │   │   ├── r1cs.br
-│   │   │   ├── vkey.json
-│   │   │   └── zkey.br
-│   │   └── circuit2
-│   │       ├── r1cs.br
-│   │       ├── vkey.json
-│   │       └── zkey.br
-│   └── transcripts
-│       ├── 0000.json
-⋮       ⋮
-⋮       ⋮
-│       ├── XXXX.json
-│       └── log.json
-├── log.json
-├── phase1.ptau
-└── r1cs
-    ├── circuit1.r1cs
-    └── circuit2.r1cs
-```
-
-You can now copy the export folder to IPFS or other circuit artifact storage.
-
 ## Contributors
 
 Run the contribution container with:
@@ -181,3 +125,80 @@ wormhole receive xx-xxxxxx-xxxxxx
 ```
 
 Your coordinator will verify your contribution.
+
+## Exporting and Formatting
+
+The final fomat will differ depending on the usecase for your circuits, included in this repo is an example export script that calculates per-circuit IPFS folders. You will need to fork and edit it to suit your needs.
+
+Build the coordinator OCI container in `exporter-example/Dockerfile`, eg. with Docker:
+
+``` sh
+docker build -t exporter . # Build container image with name 'exporter'
+```
+
+Export the results of the ceremony with:
+
+```sh
+docker run \
+--rm \ # Clean up container after run
+-it \ # Run interactive with tty
+-v ${PWD}:/workspace \ # Mount current directory to /workspace in container
+exporter \ # Container image name, change if you've built it with a different name
+export # Command
+```
+
+Enter the beacon hash you're using for the ceremony (in hex, no leading 0x), this will usually be a block hash of some pre-determined block:
+
+```
+Enter beacon hash:
+```
+
+You will end up with a finalized ceremony workspace that looks like:
+
+```
+workspace
+├── contributions
+│   ├── 0000
+│   │   ├── circuit1.zkey
+│   │   └── circuit2.zkey
+⋮   ⋮
+⋮   ⋮
+│   └── XXXX
+│       ├── circuit1.zkey
+│       ├── circuit2.zkey
+│       └── transcript.json
+├── export
+│   ├── circuits
+│   │   ├── circuit1
+│   │   │   ├── r1cs.br
+│   │   │   ├── vkey.json
+│   │   │   └── zkey.br
+│   │   └── circuit2
+│   │       ├── r1cs.br
+│   │       ├── vkey.json
+│   │       └── zkey.br
+│   └── transcripts
+│       ├── 0000.json
+⋮       ⋮
+⋮       ⋮
+│       ├── XXXX.json
+│       └── log.json
+├── log.json
+├── phase1.ptau
+└── r1cs
+    ├── circuit1.r1cs
+    └── circuit2.r1cs
+```
+
+Calculate the IPFS hash of artifacts
+
+```sh
+docker run \
+--rm \ # Clean up container after run
+-it \ # Run interactive with tty
+-v ${PWD}:/workspace \ # Mount current directory to /workspace in container
+exporter \ # Container image name, change if you've built it with a different name
+ipfs # Command
+```
+
+You can now pin the export folder to IPFS to store both individual circuit artifacts and the ceremony output.
