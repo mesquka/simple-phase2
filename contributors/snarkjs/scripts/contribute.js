@@ -5,7 +5,7 @@ const readline = require("node:readline");
 const process = require("node:process");
 const { fork } = require("node:child_process");
 
-Promise.queue = function (
+function promiseQueue (
   promises = [],
   concurrency = os.availableParallelism()
 ) {
@@ -91,7 +91,7 @@ async function main() {
       };
     });
   }
-  const result = await Promise.queue(queue);
+  const result = await promiseQueue(queue);
 
   result.forEach((contribution) => {
     transcript.contributions[contribution.circuit] = contribution.hash;

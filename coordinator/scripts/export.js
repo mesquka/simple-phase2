@@ -8,6 +8,7 @@ const {
   contributionPath,
   constants,
   askQuestion,
+  promiseQueue,
 } = require("./shared");
 
 const exportFolder = `${constants.WORKSPACE_FOLDER}/export`;
@@ -95,7 +96,7 @@ async function main() {
   }
 
   console.log("\nEXPORTING CIRCUITS");
-  const beaconContributions = await Promise.queue(beaconQueue);
+  const beaconContributions = await promiseQueue(beaconQueue);
   for (const circuit of log.circuits) {
     const vkey = await snarkjs.zKey.exportVerificationKey(
       `${tmp}/${circuit}.zkey`
@@ -108,7 +109,7 @@ async function main() {
   }
 
   console.log("\nCOMPRESSING ARTIFACTS");
-  await Promise.queue(compressionQueue);
+  await promiseQueue(compressionQueue);
 
   console.log("\nEXPORTING TRANSCRIPTS");
 

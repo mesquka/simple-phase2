@@ -6,6 +6,7 @@ const {
   verifyCircuit,
   arrayToHex,
   contributionLogFile,
+  promiseQueue,
 } = require("./shared.js");
 
 function getAllCircuits() {
@@ -33,7 +34,7 @@ async function verifyAndLog(circuits) {
     };
   });
 
-  const results = await Promise.queue(queue);
+  const results = await promiseQueue(queue);
 
   for (const circuit of results) {
     if (circuit.verification.valid == false) {

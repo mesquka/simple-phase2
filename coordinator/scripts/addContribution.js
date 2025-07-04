@@ -7,6 +7,7 @@ const {
   verifyCircuit,
   readTranscript,
   contributionPath,
+  promiseQueue,
 } = require("./shared");
 
 async function verifyCircuitContributions(
@@ -88,7 +89,7 @@ async function main() {
     };
   });
 
-  const results = await Promise.queue(queue);
+  const results = await promiseQueue(queue);
 
   for (const circuit of results) {
     allValid = allValid && circuit.verification;

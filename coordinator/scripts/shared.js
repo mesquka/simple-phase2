@@ -10,7 +10,7 @@ const CONTRIBUTIONS_PATH = `${WORKSPACE_FOLDER}/contributions`;
 const CONTRIBUTIONS_LOG = `${WORKSPACE_FOLDER}/log.json`;
 const FINAL_PATH = `${WORKSPACE_FOLDER}/final`;
 
-Promise.queue = function (
+function promiseQueue (
   promises = [],
   concurrency = os.availableParallelism()
 ) {
@@ -117,6 +117,7 @@ module.exports = {
     CONTRIBUTIONS_LOG,
     FINAL_PATH,
   },
+  promiseQueue,
   askQuestion,
   contributionPath,
   verifyCircuit,
