@@ -1,6 +1,6 @@
 const process = require("node:process");
 const snarkjs = require("snarkjs");
-const { arrayToHex } = require("../shared");
+const { arrayToHex } = require("../shared.js");
 
 process.on("message", async (msg) => {
   const { source, destination, beacon } = msg;

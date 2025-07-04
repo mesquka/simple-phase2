@@ -1,6 +1,6 @@
 const process = require("node:process");
 const snarkjs = require("snarkjs");
-const { constants, contributionPath, arrayToHex } = require("../shared");
+const { constants, contributionPath, arrayToHex } = require("../shared.js");
 
 process.on("message", async (msg) => {
   const { circuit, contributionNumber } = msg;

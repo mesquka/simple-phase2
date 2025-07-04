@@ -8,7 +8,7 @@ const {
   readTranscript,
   contributionPath,
   promiseQueue,
-} = require("./shared");
+} = require("./shared.js");
 
 async function verifyCircuitContributions(
   circuit,
