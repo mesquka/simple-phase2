@@ -1,5 +1,53 @@
 # Simple phase2 setup coordination
 
+## Contributors
+
+Run the contribution container with:
+
+```sh
+docker run --rm -it <OCI repository>/contributor
+```
+
+Enter the challenge code given to you by your coordinator when you see:
+```sh
+Enter challenge code:
+```
+
+Enter a name that your contribution will be known under, this does not have to be your real name
+```sh
+Enter your name or alias:
+```
+
+Enter some entropy when you see the following, you can mash your keyboard or use some other source of randomness:
+```sh
+Enter some random text:
+```
+
+Wait for your contribution to complete
+
+Save your contribution transcript hash, you can post this on eg. Twitter, Lens to attest to your contribution on completion of the ceremony. Consult your coordinator if you have questions. It will look like:
+
+```sh
+Transcript hash, SAVE THIS VALUE:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  /workspace/response/transcript.json
+You can share or publish this value for people to verify your contribution to the ceremony
+```
+
+Send your response code back to the coordinator alond with your transcript hash, it will look like:
+
+```sh
+SEND WORMHOLE RESPONSE CODE TO COORDINATOR
+
+Building zipfile..
+Sending directory (10 MB compressed) named 'response'
+Wormhole code is: xx-xxxxxx-xxxxxx
+On the other computer, please run:
+
+wormhole receive xx-xxxxxx-xxxxxx
+```
+
+Your coordinator will verify your contribution.
+
 ## Coordinator
 
 Prepare your initial directory structure, you need the phase1 ptau file, your circuit r1cs and initial zkey files. They need to be in a directory as following:
@@ -77,54 +125,6 @@ Enter response code:
 ```
 
 Repeat for each contributor.
-
-## Contributors
-
-Run the contribution container with:
-
-```sh
-docker run --rm -it <OCI repository>/contributor
-```
-
-Enter the challenge code given to you by your coordinator when you see:
-```sh
-Enter challenge code:
-```
-
-Enter a name that your contribution will be known under, this does not have to be your real name
-```sh
-Enter your name or alias:
-```
-
-Enter some entropy when you see the following, you can mash your keyboard or use some other source of randomness:
-```sh
-Enter some random text:
-```
-
-Wait for your contribution to complete
-
-Save your contribution transcript hash, you can post this on eg. Twitter, Lens to attest to your contribution on completion of the ceremony. Consult your coordinator if you have questions. It will look like:
-
-```sh
-Transcript hash, SAVE THIS VALUE:
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  /workspace/response/transcript.json
-You can share or publish this value for people to verify your contribution to the ceremony
-```
-
-Send your response code back to the coordinator alond with your transcript hash, it will look like:
-
-```sh
-SEND WORMHOLE RESPONSE CODE TO COORDINATOR
-
-Building zipfile..
-Sending directory (10 MB compressed) named 'response'
-Wormhole code is: xx-xxxxxx-xxxxxx
-On the other computer, please run:
-
-wormhole receive xx-xxxxxx-xxxxxx
-```
-
-Your coordinator will verify your contribution.
 
 ## Exporting and Formatting
 
