@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const os = require("node:os");
+const readline = require("node:readline");
 const { fork } = require("node:child_process");
 
 const WORKSPACE_FOLDER = "/workspace";
@@ -34,6 +35,20 @@ Promise.queue = function (
   });
 };
 
+function askQuestion(query) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise((resolve) =>
+    rl.question(query, (ans) => {
+      rl.close();
+      resolve(ans);
+    })
+  );
+}
+
 function contributionPath(contributionNumber) {
   return `${CONTRIBUTIONS_PATH}/${contributionNumber
     .toString()
@@ -44,7 +59,7 @@ async function verifyCircuit(circuit, contributionNumber) {
   return new Promise((res) => {
     console.log(`Verifying ${circuit}`);
 
-    const forked = fork("/scripts/verifySingleCircuit.js");
+    const forked = fork("/scripts/child-processes/verifySingleCircuit.js");
 
     forked.on("message", (mpcParams) => {
       res(mpcParams);
@@ -102,6 +117,7 @@ module.exports = {
     CONTRIBUTIONS_LOG,
     FINAL_PATH,
   },
+  askQuestion,
   contributionPath,
   verifyCircuit,
   arrayToHex,
