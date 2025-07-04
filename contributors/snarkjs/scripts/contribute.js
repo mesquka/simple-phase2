@@ -1,7 +1,33 @@
 #!/usr/bin/env node
+const os = require("os");
 const fs = require("node:fs");
 const readline = require("node:readline");
-const snarkjs = require("snarkjs");
+const process = require("node:process");
+const { fork } = require("node:child_process");
+
+Promise.queue = function (
+  promises = [],
+  concurrency = os.availableParallelism()
+) {
+  return new Promise((res) => {
+    const tasks = [...promises];
+    const results = [];
+
+    let resolved = false;
+
+    const runNext = () => {
+      if (tasks.length > 0) {
+        const task = tasks.shift()();
+        results.push(task);
+        task.finally(runNext);
+      } else if (!resolved) {
+        res(Promise.all(results));
+      }
+    };
+
+    for (let i = 1; i < concurrency; i += 1) runNext();
+  });
+};
 
 function askQuestion(query) {
   const rl = readline.createInterface({
@@ -17,12 +43,6 @@ function askQuestion(query) {
   );
 }
 
-function arrayToHex(array, byteLength) {
-  return Buffer.from(array)
-    .toString("hex")
-    .padStart(byteLength * 2, "0");
-}
-
 function getAllCircuits() {
   return fs
     .readdirSync("/workspace/challenge")
@@ -30,15 +50,20 @@ function getAllCircuits() {
     .map((file) => file.slice(0, -5));
 }
 
-async function contribute(circuit, name, entropy) {
-  const contributionHash = await snarkjs.zKey.contribute(
-    `/workspace/challenge/${circuit}.zkey`,
-    `/workspace/response/${circuit}.zkey`,
-    name,
-    entropy
-  );
+function contribute(circuit, name, entropy) {
+  return new Promise((res) => {
+    const forked = fork("/scripts/singleContribution.js");
 
-  return arrayToHex(contributionHash, 32);
+    forked.on("message", (contributionHash) => {
+      res(contributionHash);
+    });
+
+    forked.send({
+      circuit,
+      name,
+      entropy,
+    });
+  });
 }
 
 async function main() {
@@ -55,14 +80,23 @@ async function main() {
     contributions: {},
   };
 
+  const queue = [];
+
   for (const circuit of circuits) {
-    console.log(`Contributing to circuit ${circuit}`);
-    transcript.contributions[circuit] = await contribute(
-      circuit,
-      name,
-      entropy
-    );
+    queue.push(async () => {
+      console.log(`Contributing to circuit ${circuit}`);
+      return {
+        circuit,
+        hash: await contribute(circuit, name, entropy),
+      };
+    });
   }
+  const result = await Promise.queue(queue);
+
+  result.forEach((contribution) => {
+    transcript.contributions[contribution.circuit] = contribution.hash;
+  });
+
   console.log("\nCONTRIBUTION COMPLETE");
 
   console.log("\nWRITING TRANSCRIPT\n");
