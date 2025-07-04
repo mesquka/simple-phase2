@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
+TRANSIT_RELAY="tcp:magic-wormhole-transit.debian.net:4001"
+
 echo "Enter challenge code:"
 read CHALLENGE_CODE
 
 mkdir -p /workspace/response
 
-wormhole receive --output-file /workspace/challenge --accept-file "$CHALLENGE_CODE"
-
-rm /workspace/challenge/transcript.json
+wormhole --transit-helper="$TRANSIT_RELAY" receive --output-file /workspace/challenge --accept-file "$CHALLENGE_CODE"
 
 NODE_NO_WARNINGS=1 /scripts/contribute.js
 
@@ -19,4 +19,4 @@ echo
 echo "SEND WORMHOLE RESPONSE CODE TO COORDINATOR"
 echo
 
-wormhole send /workspace/response
+wormhole --transit-helper="$TRANSIT_RELAY" send /workspace/response
