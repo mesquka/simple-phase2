@@ -2,7 +2,6 @@
   "name": "phase2",
   "private": true,
   "dependencies": {
-    "snarkjs": "0.7.5",
-    "helia": "5.4.2"
+    "snarkjs": "0.7.5"
   }
 }

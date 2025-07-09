@@ -115,7 +115,8 @@ async function main() {
     `${exportTranscriptsFolder}/log.json`,
     `${JSON.stringify(
       {
-        beacon: beaconContributions,
+        beacon,
+        beaconContributions,
         ...log,
       },
       undefined,
