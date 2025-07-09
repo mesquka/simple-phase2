@@ -1,11 +1,11 @@
-const process = require("node:process");
-const snarkjs = require("snarkjs");
-const { arrayToHex } = require("../shared.js");
+import process from "node:process";
+import { zKey } from "snarkjs";
+import { arrayToHex } from "../shared.js";
 
 process.on("message", async (msg) => {
   const { source, destination, beacon } = msg;
 
-  const beaconContribution = await snarkjs.zKey.beacon(
+  const beaconContribution = await zKey.beacon(
     source,
     destination,
     "Beacon",

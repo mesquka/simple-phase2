@@ -1,5 +1,5 @@
-const process = require("node:process");
-const snarkjs = require("snarkjs");
+import process from "node:process";
+import { zKey } from "snarkjs";
 
 function arrayToHex(array, byteLength) {
   return Buffer.from(array)
@@ -10,7 +10,7 @@ function arrayToHex(array, byteLength) {
 process.on("message", async (msg) => {
   const { circuit, name, entropy } = msg;
 
-  const contributionHash = await snarkjs.zKey.contribute(
+  const contributionHash = await zKey.contribute(
     `/workspace/challenge/${circuit}.zkey`,
     `/workspace/response/${circuit}.zkey`,
     name,

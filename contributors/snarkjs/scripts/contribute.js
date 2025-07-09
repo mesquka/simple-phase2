@@ -1,33 +1,32 @@
 #!/usr/bin/env node
-const os = require("os");
-const fs = require("node:fs");
-const readline = require("node:readline");
-const process = require("node:process");
-const { fork } = require("node:child_process");
+import os from "os";
+import fs from "node:fs";
+import readline from "node:readline";
+import process from "node:process";
+import { fork } from "node:child_process";
 
-function promiseQueue (
-  promises = [],
-  concurrency = os.availableParallelism()
-) {
+function processParallel(tasks, concurrency = os.availableParallelism()) {
   return new Promise((res) => {
-    const tasks = [...promises];
+    const localTasks = [...tasks];
     const results = [];
 
     let resolved = false;
 
-    const runNext = () => {
-      if (tasks.length > 0) {
-        const task = tasks.shift()();
+    const runNext = async () => {
+      if (localTasks.length > 0) {
+        const task = localTasks.shift()();
         results.push(task);
-        task.finally(runNext);
+        await task;
+        runNext();
       } else if (!resolved) {
+        resolved = true;
         res(Promise.all(results));
       }
     };
 
     for (let i = 1; i < concurrency; i += 1) runNext();
   });
-};
+}
 
 function askQuestion(query) {
   const rl = readline.createInterface({
@@ -91,7 +90,7 @@ async function main() {
       };
     });
   }
-  const result = await promiseQueue(queue);
+  const result = await processParallel(queue);
 
   result.forEach((contribution) => {
     transcript.contributions[contribution.circuit] = contribution.hash;

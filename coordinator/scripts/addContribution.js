@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-const fs = require("node:fs");
-const process = require("node:process");
-const {
+import fs from "node:fs";
+import process from "node:process";
+import {
   contributionLogFile,
   getCurrentContributionNumber,
   verifyCircuit,
   readTranscript,
   contributionPath,
-  promiseQueue,
-} = require("./shared.js");
+  processParallel,
+} from "./shared.js";
 
 async function verifyCircuitContributions(
   circuit,
@@ -85,11 +85,15 @@ async function main() {
   const queue = circuits.map((circuit) => async () => {
     return {
       name: circuit,
-      verification: await verifyCircuitContributions(circuit, contributionLog, nextContributionNumber),
+      verification: await verifyCircuitContributions(
+        circuit,
+        contributionLog,
+        nextContributionNumber
+      ),
     };
   });
 
-  const results = await promiseQueue(queue);
+  const results = await processParallel(queue);
 
   for (const circuit of results) {
     allValid = allValid && circuit.verification;

@@ -1,8 +1,47 @@
+diff --git a/node_modules/snarkjs/build/browser.esm.js b/node_modules/snarkjs/build/browser.esm.js
+index 1492ab4..784d584 100644
+--- a/node_modules/snarkjs/build/browser.esm.js
++++ b/node_modules/snarkjs/build/browser.esm.js
+@@ -8536,7 +8536,7 @@ async function phase2verifyFromInit(initFileName, pTauFileName, zkeyFileName, lo
+ 
+     if (logger) logger.info("ZKey Ok!");
+ 
+-    return true;
++    return mpcParams;
+ 
+ 
+     async function sectionHasSameRatio(groupName, fd1, sections1, fd2, sections2, idSection, g2sp, g2spx, sectionName) {
 diff --git a/node_modules/snarkjs/build/main.cjs b/node_modules/snarkjs/build/main.cjs
 index 5a91ec6..7ada999 100644
 --- a/node_modules/snarkjs/build/main.cjs
 +++ b/node_modules/snarkjs/build/main.cjs
 @@ -5499,7 +5499,7 @@ async function phase2verifyFromInit(initFileName, pTauFileName, zkeyFileName, lo
+ 
+     if (logger) logger.info("ZKey Ok!");
+ 
+-    return true;
++    return mpcParams;
+ 
+ 
+     async function sectionHasSameRatio(groupName, fd1, sections1, fd2, sections2, idSection, g2sp, g2spx, sectionName) {
+diff --git a/node_modules/snarkjs/build/snarkjs.js b/node_modules/snarkjs/build/snarkjs.js
+index 42e2730..b664ef3 100644
+--- a/node_modules/snarkjs/build/snarkjs.js
++++ b/node_modules/snarkjs/build/snarkjs.js
+@@ -41305,7 +41305,7 @@ var snarkjs = (function (exports) {
+ 
+         if (logger) logger.info("ZKey Ok!");
+ 
+-        return true;
++        return mpcParams;
+ 
+ 
+         async function sectionHasSameRatio(groupName, fd1, sections1, fd2, sections2, idSection, g2sp, g2spx, sectionName) {
+diff --git a/node_modules/snarkjs/src/zkey_verify_frominit.js b/node_modules/snarkjs/src/zkey_verify_frominit.js
+index 61f99b5..6329047 100644
+--- a/node_modules/snarkjs/src/zkey_verify_frominit.js
++++ b/node_modules/snarkjs/src/zkey_verify_frominit.js
+@@ -230,7 +230,7 @@ export default async function phase2verifyFromInit(initFileName, pTauFileName, z
  
      if (logger) logger.info("ZKey Ok!");
  

@@ -1,7 +1,7 @@
-const fs = require("node:fs");
-const os = require("node:os");
-const readline = require("node:readline");
-const { fork } = require("node:child_process");
+import fs from "node:fs";
+import os from "node:os";
+import readline from "node:readline";
+import { fork } from "node:child_process";
 
 const WORKSPACE_FOLDER = "/workspace";
 const R1CS = `${WORKSPACE_FOLDER}/r1cs`;
@@ -10,21 +10,19 @@ const CONTRIBUTIONS_PATH = `${WORKSPACE_FOLDER}/contributions`;
 const CONTRIBUTIONS_LOG = `${WORKSPACE_FOLDER}/log.json`;
 const FINAL_PATH = `${WORKSPACE_FOLDER}/final`;
 
-function promiseQueue (
-  promises = [],
-  concurrency = os.availableParallelism()
-) {
+function processParallel(tasks, concurrency = os.availableParallelism()) {
   return new Promise((res) => {
-    const tasks = [...promises];
+    const localTasks = [...tasks];
     const results = [];
 
     let resolved = false;
 
-    const runNext = () => {
-      if (tasks.length > 0) {
-        const task = tasks.shift()();
+    const runNext = async () => {
+      if (localTasks.length > 0) {
+        const task = localTasks.shift()();
         results.push(task);
-        task.finally(runNext);
+        await task;
+        runNext();
       } else if (!resolved) {
         resolved = true;
         res(Promise.all(results));
@@ -33,7 +31,7 @@ function promiseQueue (
 
     for (let i = 1; i < concurrency; i += 1) runNext();
   });
-};
+}
 
 function askQuestion(query) {
   const rl = readline.createInterface({
@@ -108,16 +106,18 @@ function readTranscript(contributionNumber) {
   );
 }
 
-module.exports = {
-  constants: {
-    WORKSPACE_FOLDER,
-    R1CS,
-    PHASE1_PTAU,
-    CONTRIBUTIONS_PATH,
-    CONTRIBUTIONS_LOG,
-    FINAL_PATH,
-  },
-  promiseQueue,
+const constants = {
+  WORKSPACE_FOLDER,
+  R1CS,
+  PHASE1_PTAU,
+  CONTRIBUTIONS_PATH,
+  CONTRIBUTIONS_LOG,
+  FINAL_PATH,
+};
+
+export {
+  constants,
+  processParallel,
   askQuestion,
   contributionPath,
   verifyCircuit,

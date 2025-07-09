@@ -1,11 +1,11 @@
-const process = require("node:process");
-const snarkjs = require("snarkjs");
-const { constants, contributionPath, arrayToHex } = require("../shared.js");
+import process from "node:process";
+import { zKey } from "snarkjs";
+import { constants, contributionPath, arrayToHex } from "../shared.js";
 
 process.on("message", async (msg) => {
   const { circuit, contributionNumber } = msg;
 
-  const mpcParams = await snarkjs.zKey.verifyFromR1cs(
+  const mpcParams = await zKey.verifyFromR1cs(
     `${constants.R1CS}/${circuit}.r1cs`,
     `${constants.PHASE1_PTAU}`,
     `${contributionPath(contributionNumber)}/${circuit}.zkey`

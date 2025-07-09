@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-const fs = require("node:fs");
-const snarkjs = require("snarkjs");
-const { fork } = require("node:child_process");
-const {
+import fs from "node:fs";
+import { zKey } from "snarkjs";
+import { fork } from "node:child_process";
+import {
   contributionLogFile,
   getCurrentContributionNumber,
   contributionPath,
   constants,
   askQuestion,
-  promiseQueue,
-} = require("./shared.js");
+  processParallel,
+} from "./shared.js";
 
 const exportFolder = `${constants.WORKSPACE_FOLDER}/export`;
 const tmp = `${exportFolder}/tmp`;
@@ -96,11 +96,9 @@ async function main() {
   }
 
   console.log("\nEXPORTING CIRCUITS");
-  const beaconContributions = await promiseQueue(beaconQueue);
+  const beaconContributions = await processParallel(beaconQueue);
   for (const circuit of log.circuits) {
-    const vkey = await snarkjs.zKey.exportVerificationKey(
-      `${tmp}/${circuit}.zkey`
-    );
+    const vkey = await zKey.exportVerificationKey(`${tmp}/${circuit}.zkey`);
 
     fs.writeFileSync(
       `${exportCircuitsFolder}/${circuit}/vkey.json`,
@@ -109,7 +107,7 @@ async function main() {
   }
 
   console.log("\nCOMPRESSING ARTIFACTS");
-  await promiseQueue(compressionQueue);
+  await processParallel(compressionQueue);
 
   console.log("\nEXPORTING TRANSCRIPTS");
 

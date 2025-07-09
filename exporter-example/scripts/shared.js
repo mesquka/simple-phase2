@@ -1,6 +1,6 @@
-const fs = require("node:fs");
-const os = require("node:os");
-const readline = require("node:readline");
+import fs from "node:fs";
+import os from "node:os";
+import readline from "node:readline";
 
 const WORKSPACE_FOLDER = "/workspace";
 const R1CS = `${WORKSPACE_FOLDER}/r1cs`;
@@ -9,7 +9,7 @@ const CONTRIBUTIONS_PATH = `${WORKSPACE_FOLDER}/contributions`;
 const CONTRIBUTIONS_LOG = `${WORKSPACE_FOLDER}/log.json`;
 const FINAL_PATH = `${WORKSPACE_FOLDER}/final`;
 
-function promiseQueue (
+function processParallel(
   promises = [],
   concurrency = os.availableParallelism()
 ) {
@@ -32,7 +32,7 @@ function promiseQueue (
 
     for (let i = 1; i < concurrency; i += 1) runNext();
   });
-};
+}
 
 function askQuestion(query) {
   const rl = readline.createInterface({
@@ -84,16 +84,18 @@ function getCurrentContributionNumber() {
   return latestContributionNumber;
 }
 
-module.exports = {
-  constants: {
-    WORKSPACE_FOLDER,
-    R1CS,
-    PHASE1_PTAU,
-    CONTRIBUTIONS_PATH,
-    CONTRIBUTIONS_LOG,
-    FINAL_PATH,
-  },
-  promiseQueue,
+const constants = {
+  WORKSPACE_FOLDER,
+  R1CS,
+  PHASE1_PTAU,
+  CONTRIBUTIONS_PATH,
+  CONTRIBUTIONS_LOG,
+  FINAL_PATH,
+};
+
+export {
+  constants,
+  processParallel,
   askQuestion,
   contributionPath,
   arrayToHex,

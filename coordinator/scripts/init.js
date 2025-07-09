@@ -1,13 +1,12 @@
 #!/usr/bin/env node
-const fs = require("node:fs");
-const process = require("node:process");
-const {
+import fs from "node:fs";
+import process from "node:process";
+import {
   constants,
   verifyCircuit,
-  arrayToHex,
   contributionLogFile,
-  promiseQueue,
-} = require("./shared.js");
+  processParallel,
+} from "./shared.js";
 
 function getAllCircuits() {
   const files = fs.readdirSync(constants.R1CS);
@@ -34,7 +33,7 @@ async function verifyAndLog(circuits) {
     };
   });
 
-  const results = await promiseQueue(queue);
+  const results = await processParallel(queue);
 
   for (const circuit of results) {
     if (circuit.verification.valid == false) {

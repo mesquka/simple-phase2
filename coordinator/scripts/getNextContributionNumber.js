@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-const { getCurrentContributionNumber } = require("./shared.js");
+import { getCurrentContributionNumber } from "./shared.js";
 
 console.log((getCurrentContributionNumber() + 1).toString().padStart(4, "0"));
